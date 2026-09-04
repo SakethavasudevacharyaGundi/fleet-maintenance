@@ -5,59 +5,69 @@ const PORT = 5001;
 const server = http.createServer(app);
 
 const runTests = async () => {
-  console.log('--- Starting Auth Tests ---');
+  console.log('--- Starting Comprehensive Auth Tests ---');
   let managerToken = '';
   let techToken = '';
 
   try {
-    // 1. Missing Token
-    const res1 = await fetch(`http://localhost:${PORT}/api/protected/manager`);
-    console.log('1. Missing Token:', res1.status, await res1.text());
+    // ✓ unauthenticated protected endpoint = 401
+    // ✓ missing token
+    const resMissing = await fetch(`http://localhost:${PORT}/api/protected/manager`);
+    console.log('✓ missing token / unauthenticated protected endpoint:', resMissing.status === 401 ? 'PASS' : 'FAIL', resMissing.status);
 
-    // 2. Invalid Token
-    const res2 = await fetch(`http://localhost:${PORT}/api/protected/manager`, {
+    // ✓ invalid token
+    const resInvalid = await fetch(`http://localhost:${PORT}/api/protected/manager`, {
       headers: { Authorization: 'Bearer invalidtoken123' }
     });
-    console.log('2. Invalid Token:', res2.status, await res2.text());
+    console.log('✓ invalid token:', resInvalid.status === 401 ? 'PASS' : 'FAIL', resInvalid.status);
 
-    // 3. Login as Manager (valid)
-    const res3 = await fetch(`http://localhost:${PORT}/auth/login`, {
+    // ✓ valid manager login
+    const resManagerLogin = await fetch(`http://localhost:${PORT}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: 'manager@fleet.com', password: 'password123' })
     });
-    const data3 = await res3.json();
-    managerToken = data3.token;
-    console.log('3. Valid Manager Login:', res3.status, managerToken ? 'Token received' : 'No token');
+    const dataManager = await resManagerLogin.json();
+    managerToken = dataManager.token;
+    console.log('✓ valid manager login:', (resManagerLogin.status === 200 && managerToken) ? 'PASS' : 'FAIL', resManagerLogin.status);
 
-    // 4. Wrong password
-    const res4 = await fetch(`http://localhost:${PORT}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'manager@fleet.com', password: 'wrongpassword' })
-    });
-    console.log('4. Wrong Password Login:', res4.status, await res4.text());
-
-    // 5. Manager endpoint as Manager
-    const res5 = await fetch(`http://localhost:${PORT}/api/protected/manager`, {
-      headers: { Authorization: `Bearer ${managerToken}` }
-    });
-    console.log('5. Manager endpoint as Manager:', res5.status, await res5.text());
-
-    // 6. Login as Tech
-    const res6 = await fetch(`http://localhost:${PORT}/auth/login`, {
+    // ✓ valid technician login
+    const resTechLogin = await fetch(`http://localhost:${PORT}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: 'techa@fleet.com', password: 'password123' })
     });
-    const data6 = await res6.json();
-    techToken = data6.token;
-    
-    // 7. Manager endpoint as Technician (should be 403)
-    const res7 = await fetch(`http://localhost:${PORT}/api/protected/manager`, {
+    const dataTech = await resTechLogin.json();
+    techToken = dataTech.token;
+    console.log('✓ valid technician login:', (resTechLogin.status === 200 && techToken) ? 'PASS' : 'FAIL', resTechLogin.status);
+
+    // ✓ wrong password
+    const resWrongPw = await fetch(`http://localhost:${PORT}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'manager@fleet.com', password: 'wrongpassword' })
+    });
+    console.log('✓ wrong password:', resWrongPw.status === 401 ? 'PASS' : 'FAIL', resWrongPw.status);
+
+    // ✓ manager → manager endpoint = allowed
+    const resManagerToManager = await fetch(`http://localhost:${PORT}/api/protected/manager`, {
+      headers: { Authorization: `Bearer ${managerToken}` }
+    });
+    console.log('✓ manager → manager endpoint = allowed:', resManagerToManager.status === 200 ? 'PASS' : 'FAIL', resManagerToManager.status);
+
+    // ✓ technician → manager endpoint = 403
+    const resTechToManager = await fetch(`http://localhost:${PORT}/api/protected/manager`, {
       headers: { Authorization: `Bearer ${techToken}` }
     });
-    console.log('7. Manager endpoint as Technician:', res7.status, await res7.text());
+    console.log('✓ technician → manager endpoint = 403:', resTechToManager.status === 403 ? 'PASS' : 'FAIL', resTechToManager.status);
+
+    // ✓ client cannot escalate technician → manager
+    const resRegisterManager = await fetch(`http://localhost:${PORT}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: 'newmanager@fleet.com', password: 'password123', role: 'MANAGER' })
+    });
+    console.log('✓ client cannot escalate technician → manager via register:', resRegisterManager.status === 403 ? 'PASS' : 'FAIL', resRegisterManager.status);
 
   } catch (error) {
     console.error('Test error:', error);

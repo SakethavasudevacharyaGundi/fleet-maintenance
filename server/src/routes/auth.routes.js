@@ -13,6 +13,13 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Email, password, and role are required' });
     }
 
+    // Security Fix: Do not allow open registration of managers.
+    // In a real app, only an existing manager could create another manager.
+    // For this endpoint, we'll force the role to TECHNICIAN or reject MANAGER.
+    if (role === 'MANAGER') {
+      return res.status(403).json({ error: 'Forbidden: Cannot register as a manager' });
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: { email }
     });
