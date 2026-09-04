@@ -1,36 +1,12 @@
-# Decisions
+# Architecture & Implementation Decisions
 
-Log the decisions that actually shaped this codebase — the ones where a real alternative existed and
-you picked one. At least five entries. For each: what you chose, what you rejected, and why. At least
-one entry must be a decision you later reversed — say what changed your mind. It can be any entry
-below, not necessarily the last one; add a **Later reversed:** line to whichever one it is.
+## Database & Schema Design
 
-## Decision 1
-
-- **Chose:**
-- **Rejected:**
-- **Why:**
-
-## Decision 2
-
-- **Chose:**
-- **Rejected:**
-- **Why:**
-
-## Decision 3
-
-- **Chose:**
-- **Rejected:**
-- **Why:**
-
-## Decision 4
-
-- **Chose:**
-- **Rejected:**
-- **Why:**
-
-## Decision 5
-
-- **Chose:**
-- **Rejected:**
-- **Why:**
+- **Primary Keys**: Used UUIDs (`String @id @default(uuid())`) rather than sequential IDs to avoid exposing iteration counts (e.g., `/service-records/1`) and ensure secure public referencing.
+- **Timestamps**: Utilized PostgreSQL's native timezone handling (via Prisma's `DateTime`). The application logic will enforce operating in UTC consistently.
+- **Vehicle Servicing State**: Modeled as nullable `lastCompletedDate` and `lastCompletedOdometer`. A `null` value indicates a vehicle has never had a completed service, implicitly meaning it is due for service immediately.
+- **Service Cycle Tracking**: Added a required `becameDueAt` timestamp to `ServiceRecord`. This creates a reliable invariant to calculate `now - becameDueAt` without null checks.
+- **Data Integrity (Composite Keys)**: 
+  - Prevented duplicate technician assignments by establishing a composite primary key (`serviceRecordId`, `technicianId`) on `ServiceAssignment`.
+  - Bound alert dismissals to specific service cycles using `@@id([vehicleId, dueCycleStart])`.
+- **Indexing**: Indexed `vehicleId`, `status`, `scheduledDate`, and `updatedAt` for fast record retrieval, along with `createdAt` for events and `technicianId` for assignments.

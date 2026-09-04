@@ -1,9 +1,10 @@
 # Schema
 
-Answer each of these, in your own words.
+Our data model consists of five main entities:
 
-- Table by table: what columns and types does each one have?
-- Which relationships are one-to-many, and which are many-to-many?
-- Which constraints are enforced by the database, and which by application code — and why did you draw the line there?
-- What did you deliberately denormalise?
-- What would break first if this had 100x the data?
+- `User`: Represents both managers and technicians.
+- `Vehicle`: Tracks vehicles, including last service completion details to compute maintenance cycles.
+- `ServiceRecord`: Core entity for a maintenance cycle, explicitly defining `becameDueAt`.
+- `ServiceAssignment`: Maps technicians to service records via a composite key (`serviceRecordId`, `technicianId`).
+- `ServiceEvent`: Audit log and lifecycle tracking for service records.
+- `AlertDismissal`: Tracks when a manager dismisses an alert for a specific service cycle.

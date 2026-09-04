@@ -3,6 +3,126 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum UserRole {
+  MANAGER
+  TECHNICIAN
+}
+
+enum ServiceStatus {
+  DUE
+  BOOKED
+  IN_SERVICE
+  COMPLETED
+}
+
+enum EventType {
+  CREATED
+  STATUS_CHANGE
+  ASSIGNED
+  UNASSIGNED
+  NOTE
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  createdEvents    ServiceEvent[]      @relation("UserCreatedEvents")
+  assignedServices ServiceAssignment[]
+
+  @@map("users")
+}
+
+model Vehicle {
+  id                    String    @id @default(uuid())
+  registration          String    @unique
+  make                  String
+  model                 String
+  odometer              Int
+  dateIntervalDays      Int       @map("date_interval_days")
+  mileageInterval       Int       @map("mileage_interval")
+  lastCompletedDate     DateTime? @map("last_completed_date")
+  lastCompletedOdometer Int?      @map("last_completed_odometer")
+  archivedAt            DateTime? @map("archived_at")
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  serviceRecords  ServiceRecord[]
+  alertDismissals AlertDismissal[]
+
+  @@map("vehicles")
+}
+
+model ServiceRecord {
+  id            String        @id @default(uuid())
+  vehicleId     String        @map("vehicle_id")
+  description   String
+  status        ServiceStatus
+  becameDueAt   DateTime      @map("became_due_at")
+  scheduledDate DateTime?     @map("scheduled_date")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  vehicle     Vehicle             @relation(fields: [vehicleId], references: [id])
+  assignments ServiceAssignment[]
+  events      ServiceEvent[]
+
+  @@index([vehicleId])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([updatedAt])
+  @@map("service_records")
+}
+
+model ServiceAssignment {
+  serviceRecordId String @map("service_record_id")
+  technicianId    String @map("technician_id")
+
+  // Relations
+  serviceRecord ServiceRecord @relation(fields: [serviceRecordId], references: [id])
+  technician    User          @relation(fields: [technicianId], references: [id])
+
+  @@id([serviceRecordId, technicianId])
+  @@index([technicianId])
+  @@map("service_assignments")
+}
+
+model ServiceEvent {
+  id              String    @id @default(uuid())
+  serviceRecordId String    @map("service_record_id")
+  actorId         String    @map("actor_id")
+  type            EventType
+  oldValue        String?   @map("old_value")
+  newValue        String?   @map("new_value")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  serviceRecord ServiceRecord @relation(fields: [serviceRecordId], references: [id])
+  actor         User          @relation("UserCreatedEvents", fields: [actorId], references: [id])
+
+  @@index([serviceRecordId])
+  @@index([createdAt])
+  @@map("service_events")
+}
+
+model AlertDismissal {
+  vehicleId     String   @map("vehicle_id")
+  dueCycleStart DateTime @map("due_cycle_start")
+  dismissedAt   DateTime @default(now()) @map("dismissed_at")
+
+  // Relations
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+
+  @@id([vehicleId, dueCycleStart])
+  @@map("alert_dismissals")
 }

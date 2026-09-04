@@ -1,3 +1,4 @@
+
 # Assignment 08 — Fleet Maintenance
 
 ## The scenario
@@ -27,62 +28,53 @@ move, what a bulk action must report back, when a dismissed alert is allowed to 
 specifics are the actual ask, not just the bold headline in front of them.
 
 1. **Accounts and roles.** People sign in with an email and password, and there are at least two
-roles — a fleet manager role and a technician role. Fleet managers create and archive vehicles, set
-each vehicle's service intervals, assign technicians to service records, and see the whole fleet.
-Technicians can only see and update service records assigned to them, and cannot create vehicles,
-change service intervals, or reassign a record to someone else. The difference must be enforced on
-the server, not just hidden in the interface.
-
+   roles — a fleet manager role and a technician role. Fleet managers create and archive vehicles, set
+   each vehicle's service intervals, assign technicians to service records, and see the whole fleet.
+   Technicians can only see and update service records assigned to them, and cannot create vehicles,
+   change service intervals, or reassign a record to someone else. The difference must be enforced on
+   the server, not just hidden in the interface.
 2. **Vehicles.** Fleet managers create vehicles with a registration number, a make and model, a
-current odometer reading, a date interval and a mileage interval for service, and can edit them
-later. Vehicles can be archived and restored. Archiving removes a vehicle from the default fleet
-view without destroying its service history.
-
+   current odometer reading, a date interval and a mileage interval for service, and can edit them
+   later. Vehicles can be archived and restored. Archiving removes a vehicle from the default fleet
+   view without destroying its service history.
 3. **Service records.** Every service record belongs to exactly one vehicle and carries a
-description of the work, plus which technicians are currently assigned to it. Records can be created
-by a fleet manager, and their description of the work updated by whoever is assigned, but not who is
-assigned to them. Opening a vehicle shows its service history.
-
+   description of the work, plus which technicians are currently assigned to it. Records can be created
+   by a fleet manager, and their description of the work updated by whoever is assigned, but not who is
+   assigned to them. Opening a vehicle shows its service history.
 4. **A service lifecycle with rules.** A service record moves through *Due → Booked → In Service →
-Completed*. A vehicle becomes due for its next service when either its date interval or its mileage
-interval is reached since its last completed service, whichever happens first; a record that remains
-Due for longer than a set grace period without being booked counts as overdue. Booking assigns a
-scheduled date and a technician, moving the record to Booked; work then moves it to In Service and
-finally to Completed. Completing a service resets both counters, so the date and mileage intervals
-both start again from that service's date and odometer reading, and any other move must be rejected
-by the server with a message explaining why.
-
+   Completed*. A vehicle becomes due for its next service when either its date interval or its mileage
+   interval is reached since its last completed service, whichever happens first; a record that remains
+   Due for longer than a set grace period without being booked counts as overdue. Booking assigns a
+   scheduled date and a technician, moving the record to Booked; work then moves it to In Service and
+   finally to Completed. Completing a service resets both counters, so the date and mileage intervals
+   both start again from that service's date and odometer reading, and any other move must be rejected
+   by the server with a message explaining why.
 5. **Assignment.** Any number of technicians can be assigned to a service record, and a single
-technician can be assigned to any number of records at once. Only a fleet manager can add or remove
-a technician's assignment. Every technician can see one list of every record assigned to them,
-across every vehicle.
-
+   technician can be assigned to any number of records at once. Only a fleet manager can add or remove
+   a technician's assignment. Every technician can see one list of every record assigned to them,
+   across every vehicle.
 6. **Finding service records.** One list shows service records across every vehicle the viewer can
-see, with a text search over descriptions, filters for vehicle, status and technician, sorting by
-scheduled date, status or last update, and pagination showing the total number of matches. All of
-this must happen on the server — do not load every service record into the browser and filter there.
-
+   see, with a text search over descriptions, filters for vehicle, status and technician, sorting by
+   scheduled date, status or last update, and pagination showing the total number of matches. All of
+   this must happen on the server — do not load every service record into the browser and filter there.
 7. **Acting on many odometer readings at once.** Fleet managers can bulk-update odometer readings
-from a CSV file of vehicle identifiers and readings. The result is a per-row report: a row succeeds
-and updates the vehicle's current reading, or is rejected — with a reason — if its reading is lower
-than that vehicle's most recently recorded one, and valid rows are applied even when others in the
-same file are rejected. Separately, export the service history — every service record with its
-vehicle, dates, and status — as a CSV file.
-
+   from a CSV file of vehicle identifiers and readings. The result is a per-row report: a row succeeds
+   and updates the vehicle's current reading, or is rejected — with a reason — if its reading is lower
+   than that vehicle's most recently recorded one, and valid rows are applied even when others in the
+   same file are rejected. Separately, export the service history — every service record with its
+   vehicle, dates, and status — as a CSV file.
 8. **A dashboard.** A landing view shows headline numbers — vehicles due for service, vehicles
-currently in service, services completed this week, and vehicles overdue for service. It also breaks
-service records down by status and by technician, and charts services completed per week over the
-last eight weeks.
-
+   currently in service, services completed this week, and vehicles overdue for service. It also breaks
+   service records down by status and by technician, and charts services completed per week over the
+   last eight weeks.
 9. **History you cannot rewrite.** Every service record has a timeline showing when it was created,
-every status change with the old and new value and who made it, every technician assignment and
-unassignment, and any notes left on it. Nothing in this timeline can be edited or deleted after the
-fact, including by fleet managers.
-
+   every status change with the old and new value and who made it, every technician assignment and
+   unassignment, and any notes left on it. Nothing in this timeline can be edited or deleted after the
+   fact, including by fleet managers.
 10. **Overdue service alerts.** A service record that has become overdue appears in an alerts area,
-with a count badge visible in the navigation. A fleet manager can dismiss the alert for that
-vehicle. If the vehicle becomes due again for its next service and is again left unbooked past the
-same grace period, the alert returns.
+    with a count badge visible in the navigation. A fleet manager can dismiss the alert for that
+    vehicle. If the vehicle becomes due again for its next service and is again left unbooked past the
+    same grace period, the alert returns.
 
 ## Stretch ideas (optional)
 
@@ -98,7 +90,6 @@ left over, pick whichever of these sounds most useful and build it:
 - Driver assignment to vehicles.
 - Location tracking integration.
 - Warranty and recall tracking.
-
 
 ---
 
@@ -143,13 +134,13 @@ A repository whose entire history is a single "initial commit" containing a fini
 
 Alongside your code, commit these five files under `docs/`. Your zip includes a stub for each with the questions it needs to answer — fill them in as you go, not from memory at the end.
 
-| File | What it must answer |
-|------|----------------------|
-| `docs/architecture.md` | What the moving pieces are, how they talk to each other, where each one runs, the request path for one representative user action end to end, and what you decided not to build. |
-| `docs/schema.md` | Every table's columns and types, which relationships are one-to-many versus many-to-many, which constraints live in the database versus the application, what you deliberately denormalised, and what would break first at 100x the data. |
-| `docs/plan.md` | How you split the work into sessions, what order you built in and why, what you estimated versus what it actually took, and what you cut when you ran short. |
-| `docs/decisions.md` | At least five real decisions — what you chose, what you rejected, and why — including at least one you later reversed. |
-| `docs/ai-prompts.md` | The prompts you actually used, in order, grouped by what you were trying to do, including at least one that produced something wrong and what you did about it. |
+| File                     | What it must answer                                                                                                                                                                                                                       |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `docs/architecture.md` | What the moving pieces are, how they talk to each other, where each one runs, the request path for one representative user action end to end, and what you decided not to build.                                                          |
+| `docs/schema.md`       | Every table's columns and types, which relationships are one-to-many versus many-to-many, which constraints live in the database versus the application, what you deliberately denormalised, and what would break first at 100x the data. |
+| `docs/plan.md`         | How you split the work into sessions, what order you built in and why, what you estimated versus what it actually took, and what you cut when you ran short.                                                                              |
+| `docs/decisions.md`    | At least five real decisions — what you chose, what you rejected, and why — including at least one you later reversed.                                                                                                                  |
+| `docs/ai-prompts.md`   | The prompts you actually used, in order, grouped by what you were trying to do, including at least one that produced something wrong and what you did about it.                                                                           |
 
 ## Host it for free
 
