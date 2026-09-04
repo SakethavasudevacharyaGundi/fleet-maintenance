@@ -12,9 +12,11 @@ app.get('/api/health', (req, res) => {
 });
 
 const authRoutes = require('./routes/auth.routes');
+const vehicleRoutes = require('./routes/vehicle.routes');
 const { requireAuth, requireRole } = require('./middleware/auth.middleware');
 
 app.use('/auth', authRoutes);
+app.use('/api/vehicles', vehicleRoutes);
 
 // Test protected endpoints
 app.get('/api/protected/manager', requireAuth, requireRole('MANAGER'), (req, res) => {
