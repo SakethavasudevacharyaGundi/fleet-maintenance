@@ -51,8 +51,7 @@ export default function Login() {
 
   // Fetch real public stats on mount
   useEffect(() => {
-    fetch("/api/public/stats")
-      .then(r => r.json())
+    api.get("/api/public/stats")
       .then(setStats)
       .catch(() => {});
   }, []);
