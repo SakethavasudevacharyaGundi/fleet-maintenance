@@ -277,6 +277,50 @@ async function main() {
     ],
   });
 
+  // Additional records keep the demo useful across pagination and include
+  // unassigned due work for the manager workflow.
+  const demoVehicles = vehiclesData.filter(v => !v.archived).map(v => v.reg);
+  const demoTechnicians = [IDS.techA, IDS.techB, IDS.techC, IDS.techD, IDS.techE, IDS.techF, IDS.techG, IDS.techH, IDS.techI, IDS.techJ];
+  const demoStatuses = [ServiceStatus.DUE, ServiceStatus.BOOKED, ServiceStatus.IN_SERVICE, ServiceStatus.COMPLETED];
+
+  for (let i = 11; i <= 40; i++) {
+    const status = demoStatuses[i % demoStatuses.length];
+    const createdAt = daysAgo(i + 4);
+    const scheduledDate = status === ServiceStatus.DUE ? undefined : daysAgo(i + 2);
+    const completedAt = status === ServiceStatus.COMPLETED ? daysAgo(i % 5) : undefined;
+    const isUnassigned = status === ServiceStatus.DUE && i % 2 === 1;
+    const techIds = isUnassigned ? [] : [demoTechnicians[i % demoTechnicians.length]];
+    const events: { id: string; actorId: string; type: EventType; oldValue?: string; newValue?: string; createdAt: Date }[] = [
+      { id: `se-${i}-1`, actorId: M, type: EventType.CREATED, createdAt },
+    ];
+
+    if (techIds.length > 0) {
+      events.push({ id: `se-${i}-2`, actorId: M, type: EventType.ASSIGNED, newValue: techIds[0], createdAt: daysAgo(i + 3) });
+    }
+    if (status !== ServiceStatus.DUE) {
+      events.push({ id: `se-${i}-3`, actorId: M, type: EventType.STATUS_CHANGE, oldValue: 'DUE', newValue: 'BOOKED', createdAt: daysAgo(i + 2) });
+    }
+    if (status === ServiceStatus.IN_SERVICE || status === ServiceStatus.COMPLETED) {
+      events.push({ id: `se-${i}-4`, actorId: techIds[0] || M, type: EventType.STATUS_CHANGE, oldValue: 'BOOKED', newValue: 'IN_SERVICE', createdAt: daysAgo(i + 1) });
+    }
+    if (status === ServiceStatus.COMPLETED) {
+      events.push({ id: `se-${i}-5`, actorId: techIds[0] || M, type: EventType.STATUS_CHANGE, oldValue: 'IN_SERVICE', newValue: 'COMPLETED', createdAt: completedAt! });
+    }
+
+    await makeRecord({
+      id: `sr-${String(i).padStart(3, '0')}`,
+      reg: demoVehicles[i % demoVehicles.length],
+      desc: `Scheduled maintenance check ${i} — fluids, brakes and safety inspection`,
+      status,
+      becameDueAt: createdAt,
+      scheduledDate,
+      completedAt,
+      createdAt,
+      techIds,
+      events,
+    });
+  }
+
   // ── Alert dismissal ───────────────────────────────────────────────────────
   const ovrMh = await veh('OVR-MH-002');
   await prisma.alertDismissal.create({
