@@ -85,7 +85,14 @@ router.post('/login', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        role: user.role
+        name: user.name || user.email.split('@')[0],
+        role: user.role,
+        tag: user.role === 'MANAGER'
+          ? 'Manager'
+          : (() => {
+              const idx = user.email.match(/tech([abc])/i)?.[1]?.toUpperCase();
+              return idx ? `Tech ${idx}` : 'Technician';
+            })(),
       }
     });
   } catch (error) {
