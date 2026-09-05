@@ -34,7 +34,8 @@ export const api = {
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(endpoint, { method: 'GET', headers });
+    const url = (import.meta.env.VITE_API_URL || '') + endpoint;
+    const res = await fetch(url, { method: 'GET', headers });
     return handleResponse(res);
   },
   post: async (endpoint: string, body: any, isFormData = false) => {
@@ -50,7 +51,8 @@ export const api = {
       options.body = JSON.stringify(body);
     }
 
-    const res = await fetch(endpoint, options);
+    const url = (import.meta.env.VITE_API_URL || '') + endpoint;
+    const res = await fetch(url, options);
     return handleResponse(res);
   },
   put: async (endpoint: string, body: any) => {
@@ -60,7 +62,8 @@ export const api = {
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(endpoint, {
+    const url = (import.meta.env.VITE_API_URL || '') + endpoint;
+    const res = await fetch(url, {
       method: 'PUT',
       headers,
       body: JSON.stringify(body),
@@ -74,7 +77,8 @@ export const api = {
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(endpoint, {
+    const url = (import.meta.env.VITE_API_URL || '') + endpoint;
+    const res = await fetch(url, {
       method: 'PATCH',
       headers,
       body: JSON.stringify(body),
@@ -88,7 +92,8 @@ export const api = {
     };
     if (token) headers['Authorization'] = `Bearer ${token}`;
 
-    const res = await fetch(endpoint, { method: 'DELETE', headers });
+    const url = (import.meta.env.VITE_API_URL || '') + endpoint;
+    const res = await fetch(url, { method: 'DELETE', headers });
     return handleResponse(res);
   },
 };
