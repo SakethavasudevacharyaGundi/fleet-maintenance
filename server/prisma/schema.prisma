@@ -31,6 +31,7 @@ enum EventType {
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
+  name         String   @default("")
   passwordHash String   @map("password_hash")
   role         UserRole
   createdAt    DateTime @default(now()) @map("created_at")
@@ -71,6 +72,7 @@ model ServiceRecord {
   scheduledDate DateTime?     @map("scheduled_date")
   createdAt     DateTime      @default(now()) @map("created_at")
   updatedAt     DateTime      @updatedAt @map("updated_at")
+  completedAt   DateTime?     @map("completed_at")
 
   // Relations
   vehicle     Vehicle             @relation(fields: [vehicleId], references: [id])
