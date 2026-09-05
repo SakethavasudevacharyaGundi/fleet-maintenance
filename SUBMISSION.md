@@ -24,7 +24,7 @@ The backend uses Render's free tier and may sleep after inactivity. The first re
 
 | Layer | What you used | Why |
 | ----- | ------------- | --- |
-| Frontend | React 19, Vite, TypeScript | Fast iteration and strong typing |
+| Frontend | React 19, Vite, TypeScript | Fast to build in, and TypeScript catches lifecycle/role mismatches before runtime |
 | Backend | Node.js, Express 5 | Lightweight server for this application size |
 | Database | PostgreSQL on Supabase with Prisma | Managed PostgreSQL with a clear ORM workflow |
 | Hosting | Vercel and Render | Free tier hosting with GitHub deployment |
