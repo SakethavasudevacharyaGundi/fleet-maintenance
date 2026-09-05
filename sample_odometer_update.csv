@@ -1,0 +1,6 @@
+REG,MAKE,MODEL,YEAR,ODOMETER,TECHNICIAN
+REC-001,Ford,Transit,2021,16000,M. Rajan
+REC-002,Ford,Transit,2021,25000,P. Venkat
+REC-003,Mercedes,Sprinter,2020,49000,S. Anand
+UNKNOWN-1,,Supro,2023,18000,M. Rajan
+REC-001,Ford,Transit,2021,-1000,P. Venkat
