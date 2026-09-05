@@ -1,0 +1,11 @@
+{
+  "title": "FleetCo Operations",
+  "description": "Streamline fleet management with a user-friendly interface for tracking vehicle service records, alerts, and technician assignments, designed for mechanics and fleet managers.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
