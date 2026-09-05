@@ -24,13 +24,14 @@ export default function Dashboard() {
       try {
         const [dashRes, alertsRes, techniciansRes] = await Promise.all([
           api.get("/api/dashboard"),
-          api.get("/api/alerts"),
-          isManager ? api.get("/api/users/technicians") : Promise.resolve([])
+          api.get("/api/alerts").catch(() => []),
+          isManager ? api.get("/api/users/technicians").catch(() => []) : Promise.resolve([])
         ]);
         const counts = new Map((dashRes.byTechnician ?? []).map((tech: any) => [tech.technicianId, tech.count]));
-        setData({ dashboard: { ...dashRes, byTechnician: techniciansRes.map((tech: any) => ({ ...tech, count: counts.get(tech.id) ?? 0 })) }, alerts: alertsRes });
+        setData({ dashboard: { ...dashRes, byTechnician: (techniciansRes ?? []).map((tech: any) => ({ ...tech, count: counts.get(tech.id) ?? 0 })) }, alerts: alertsRes ?? [] });
       } catch (err) {
         console.error(err);
+        setData({ dashboard: { summary: {}, weeklyCompleted: [], byTechnician: [] }, alerts: [] });
       } finally {
         setLoading(false);
       }
