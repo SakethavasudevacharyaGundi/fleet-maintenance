@@ -79,7 +79,7 @@ export default function ServiceList() {
 
   const handleExport = async () => {
     try {
-      const endpoint = "/api/service-records/export.csv";
+      const endpoint = (import.meta.env.VITE_API_URL || '') + "/api/service-records/export.csv";
       const params = new URLSearchParams({
         sort: sortKey,
         order: sortDir,
